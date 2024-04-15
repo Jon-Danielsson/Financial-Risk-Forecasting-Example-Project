@@ -1,0 +1,9 @@
+---
+title: "Volatility analysis"
+author: "John S. Smith"
+date: "1 January 2024"
+format: docx
+editor: visual 
+---
+
+{{< include report.qmd >}}

@@ -1,0 +1,74 @@
+
+```{r}
+#| echo: false
+source('../Code/libraries.r')
+source("../Code/ProcessRawData.r")
+source("../Code/FitModels.r")
+sp500=ProcessRawData()
+```
+
+```{r}
+#| echo: false
+Result=FitModels(Model="GARCH11",Data=sp500,)
+omega=coef(Result)['omega']
+alpha=coef(Result)['alpha1']
+beta=coef(Result)['beta1']
+LogLikelihood = likelihood(Result)  
+
+```
+
+# Data
+
+* We are analysing SP-500 returns 
+* from `r min(sp500$date.ts)` to `r max(sp500$date.ts)`
+* `r length(sp500$date.ts)` observations
+* If you like thousand commas in your numbers, then  `r prettyNum(length(sp500$date.ts), big.mark = ",")` observations
+
+# The SP-500 index
+```{r}
+#| echo: false
+plot(sp500$price.ts,
+ lwd=2,
+ col='blue',
+ las=1,
+ bty='l',
+ xlab="day",
+ ylab='price'
+)
+```
+
+# Fitted model parameters
+
+
+```{r}
+#| echo: false
+knitr::kable(Result@fit$matcoef)
+```
+
+# Summary
+
+
+* Note that since alpha+beta=`r round(alpha+beta,2)`<1, the model is covariance stationary
+* Note that since $\alpha+\beta=`r round(alpha+beta,2)`<1$, the model is covariance stationary
+* The Log Likelihood is `r prettyNum(LogLikelihood, big.mark = ",")`
+
+
+
+# Returns with 2 times volatility
+
+```{r}
+#| echo: false
+
+plot(Result,which=1)
+```
+
+# Some VaR analysis
+
+```{r}
+Portfolio = 1000
+sigma = 0.01
+p = 0.05
+VaR = -qnorm(p) * Portfolio * sigma
+```
+
+Risk is \$`r round(VaR,1)` according to the VaR.
